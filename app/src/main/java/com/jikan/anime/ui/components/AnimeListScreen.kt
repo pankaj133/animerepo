@@ -1,5 +1,6 @@
 package com.jikan.anime.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,12 +65,14 @@ fun AnimeListScreen(
                 .padding(padding)
         ) {
 
+            Log.i("pankaj", "AnimeListScreen: ")
             if (animeLazyPagingList.itemCount > 0) {
                 LazyColumn(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(animeLazyPagingList.itemCount) { index ->
+
                         animeLazyPagingList[index]?.let { anime ->
                             AnimeItem(anime = anime) {
 

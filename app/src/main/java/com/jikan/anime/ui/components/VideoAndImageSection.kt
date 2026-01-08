@@ -90,22 +90,3 @@ fun VideoAndImageSection(
 
     }
 }
-
-@Composable
-fun YouTubePlayer(
-    videoId: String, modifier: Modifier = Modifier
-) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    AndroidView(
-        modifier = modifier, factory = { context ->
-            YouTubePlayerView(context).apply {
-                lifecycleOwner.lifecycle.addObserver(this)
-                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                        youTubePlayer.loadVideo(videoId, 0f)
-                    }
-                })
-            }
-        })
-}

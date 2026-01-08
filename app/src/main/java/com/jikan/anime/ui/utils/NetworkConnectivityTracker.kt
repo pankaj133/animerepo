@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-class NetworkConnectivityTracker(
+class
+NetworkConnectivityTracker(
     context: Context
 ) {
     private val connectivityManager =
