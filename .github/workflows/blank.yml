@@ -1,27 +1,32 @@
-name: Android Build
+name: Firebase App Distribution
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  build:
+  distribute:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          distribution: temurin
-          java-version: 17
+          node-version: 18
 
-      - name: Grant execute permission
-        run: chmod +x gradlew
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
+          firebase appdistribution:distribute app-release.apk \
+            --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
+            --groups "testers" \
+            --release-notes "Automated build from GitHub Actions"
