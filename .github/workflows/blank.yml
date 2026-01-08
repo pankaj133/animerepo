@@ -1,39 +1,27 @@
-# This is a basic workflow to help you get started with Actions
+name: Android Build
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [ main ]
+  pull_request:
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  distribute:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: 18
+          distribution: temurin
+          java-version: 17
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Grant execute permission
+        run: chmod +x gradlew
 
-      - name: Upload to Firebase App Distribution
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
-          firebase appdistribution:distribute app-release.apk \
-            --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
-            --groups "testers" \
-            --release-notes "Automated build from GitHub Actions"
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
