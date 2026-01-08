@@ -1,38 +1,30 @@
-name: Firebase App Distribution
+name: Android CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  distribute:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          node-version: 18
+          java-version: '11'
+          distribution: 'anime'
+          cache: gradle
 
-      - name: Install Firebase CLI
-        run: curl -sL https://firebase.tools | bash
-
-      - name: Authenticate Firebase
-        run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Upload to Firebase App Distribution
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
-          firebase appdistribution:distribute app-release.apk \
-            --app ${{ secrets.FIREBASE_APP_ID_ANDROID }} \
-            --groups "testers" \
-            --release-notes "Automated build from GitHub Actions"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: build release
+        run: ./gradlew assembleDebug
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.5.1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          groups: anime
