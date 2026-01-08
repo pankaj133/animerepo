@@ -19,7 +19,13 @@ jobs:
           node-version: 18
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: curl -sL https://firebase.tools | bash
+
+      - name: Authenticate Firebase
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > firebase-key.json
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - name: Upload to Firebase App Distribution
         env:
